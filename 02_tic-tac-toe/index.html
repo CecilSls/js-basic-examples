@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego del gato</title>
+</head>
+<body>
+
+    <canvas id="canvas" width="200" height="200" style="border: 1px solid #000"></canvas>
+
+    <h2 id="resultado"></h2>
+    
+    <script src="main.js"></script>
+    <script>
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let linesPosition = [66, 132];
+        let finish = false;
+        
+        createBoard();
+        
+        function createBoard(){
+            for(const z in linesPosition){
+                ctx.moveTo(linesPosition[z], 0);
+                ctx.lineTo(linesPosition[z], 200);
+                ctx.stroke();
+                
+                ctx.moveTo(0, linesPosition[z]);
+                ctx.lineTo(200, linesPosition[z]);
+                ctx.stroke();  
+            }
+        }
+
+        function drawCross(x1, y1, x2, y2){
+            ctx.beginPath();
+            
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            ctx.moveTo(x2, y2 - 66);
+            ctx.lineTo(x2 - 66, y1 + 66);
+            ctx.stroke();
+
+        }
+
+        function drawCircle(x, y){
+            ctx.beginPath();
+            ctx.arc(x + 30, y + 30, 20, 0, 2 * Math.PI);
+            ctx.stroke();
+        }
+
+        canvas.addEventListener('click', (e)=>{
+            if(!finish){
+                let x = e.offsetX;
+                let y = e.offsetY;
+                let response = '';
+                let positionBoard = [
+                    [0, 66],
+                    [67, 132],
+                    [133, 200]
+                ];
+
+                for(const col in positionBoard){
+                    let a = 0;
+                    for(const row in positionBoard){
+                        if( x >= positionBoard[col][0] && 
+                            x <= positionBoard[col][1] &&
+                            y >= positionBoard[row][0] &&
+                            y <= positionBoard[row][1] ){
+                            let draw = fillGameArea(row, col);
+                            if(draw){
+                                if(currentPlayer === 0){
+                                drawCircle(positionBoard[col][0], positionBoard[row][0]);
+                                }else{
+                                    drawCross(positionBoard[col][0], positionBoard[row][0], positionBoard[col][1], positionBoard[row][1]);
+                                }
+                            }
+                            
+                            if(moves === 9){
+                                response = "Draw";
+                                finish = true;
+                            }else if( resolution() ){
+                                response = "Player " + currentPlayer + " WINS!!";
+                                finish = true;
+                            }else{
+                                currentPlayer = (currentPlayer === 1) ? 0 : 1;
+                            }
+                            document.getElementById("resultado").innerHTML = response;
+                            return;
+                        }
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>
